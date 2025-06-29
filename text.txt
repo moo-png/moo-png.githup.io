@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع تذكير المواعيد</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        input, button {
+            padding: 10px;
+            width: 100%;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .reminder {
+            background: #f9f9f9;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>تذكير المواعيد</h1>
+        <div class="input-group">
+            <input type="text" id="reminderText" placeholder="مثال: اجتماع مع أحمد غدًا الساعة 10 صباحًا">
+            <input type="datetime-local" id="reminderDate">
+            <button onclick="addReminder()">إضافة تذكير</button>
+        </div>
+        <div id="remindersList"></div>
+    </div>
+
+    <script>
+        let reminders = [];
+
+        function addReminder() {
+            const text = document.getElementById('reminderText').value;
+            const date = document.getElementById('reminderDate').value;
+
+            if (!text || !date) {
+                alert("الرجاء إدخال النص والتاريخ!");
+                return;
+            }
+
+            const reminder = {
+                text,
+                date: new Date(date).toLocaleString('ar-EG')
+            };
+
+            reminders.push(reminder);
+            saveReminders();
+            displayReminders();
+            document.getElementById('reminderText').value = '';
+        }
+
+        function displayReminders() {
+            const list = document.getElementById('remindersList');
+            list.innerHTML = '';
+
+            reminders.forEach((reminder, index) => {
+                const div = document.createElement('div');
+                div.className = 'reminder';
+                div.innerHTML = `
+                    <p><strong>${reminder.text}</strong></p>
+                    <p>الموعد: ${reminder.date}</p>
+                    <button onclick="deleteReminder(${index})">حذف</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function deleteReminder(index) {
+            reminders.splice(index, 1);
+            saveReminders();
+            displayReminders();
+        }
+
+        function saveReminders() {
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+        }
+
+        function loadReminders() {
+            const saved = localStorage.getItem('reminders');
+            if (saved) {
+                reminders = JSON.parse(saved);
+                displayReminders();
+            }
+        }
+
+        // تحميل التذكيرات عند فتح الصفحة
+        window.onload = loadReminders;
+    </script>
+</body>
+</html>
